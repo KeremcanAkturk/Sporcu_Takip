@@ -1,0 +1,114 @@
+import tkinter as tk
+from tkinter import messagebox, simpledialog
+
+class Antrenman:
+    def __init__(self, ad, detay):
+        self.ad = ad
+        self.detay = detay
+
+class Sporcu:
+    def __init__(self, isim, spor_dali):
+        self.isim = isim
+        self.spor_dali = spor_dali
+        self.antrenmanlar = []
+        self.ilerlemeler = []
+
+    def program_olustur(self, antrenman):
+        self.antrenmanlar.append(antrenman)
+
+    def ilerleme_kaydet(self, ilerleme):
+        self.ilerlemeler.append(ilerleme)
+
+    def rapor_al(self):
+        rapor = f"{self.isim} - {self.spor_dali}\n\nAntrenmanlar:\n"
+        rapor += "\n".join([f"- {a.ad}: {a.detay}" for a in self.antrenmanlar]) + "\n\nİlerlemeler:\n"
+        rapor += "\n".join([f"- {i}" for i in self.ilerlemeler])
+        return rapor
+
+sporcular = []
+
+def sporcu_ekle_gui():
+    isim = simpledialog.askstring("Sporcu Ekle", "İsim:")
+    spor_dali = simpledialog.askstring("Sporcu Ekle", "Spor Dalı:")
+    if isim and spor_dali:
+        sporcu = Sporcu(isim, spor_dali)
+        sporcular.append(sporcu)
+        messagebox.showinfo("Başarılı", f"{isim} eklendi.")
+        guncelle_liste()
+
+def program_ekle_gui():
+    isim = simpledialog.askstring("Program Oluştur", "Sporcu İsmi:")
+    sporcu = next((s for s in sporcular if s.isim == isim), None)
+    if not sporcu:
+        messagebox.showerror("Hata", "Sporcu bulunamadı!")
+        return
+
+    ad = simpledialog.askstring("Antrenman Ekle", "Antrenman Adı:")
+    detay = simpledialog.askstring("Antrenman Ekle", "Detay:")
+    if ad and detay:
+        antrenman = Antrenman(ad, detay)
+        sporcu.program_olustur(antrenman)
+        messagebox.showinfo("Başarılı", "Antrenman programına eklendi.")
+
+def ilerleme_kaydet_gui():
+    isim = simpledialog.askstring("İlerleme Kaydet", "Sporcu İsmi:")
+    sporcu = next((s for s in sporcular if s.isim == isim), None)
+    if not sporcu:
+        messagebox.showerror("Hata", "Sporcu bulunamadı!")
+        return
+
+    ilerleme = simpledialog.askstring("İlerleme", "İlerleme Notu:")
+    if ilerleme:
+        sporcu.ilerleme_kaydet(ilerleme)
+        messagebox.showinfo("Başarılı", "İlerleme kaydedildi.")
+
+def rapor_al_gui():
+    isim = simpledialog.askstring("Rapor Al", "Sporcu İsmi:")
+    sporcu = next((s for s in sporcular if s.isim == isim), None)
+    if not sporcu:
+        messagebox.showerror("Hata", "Sporcu bulunamadı!")
+        return
+
+    rapor = sporcu.rapor_al()
+    messagebox.showinfo("Rapor", rapor)
+
+def sporcu_listesi():
+    return [f"{s.isim} - {s.spor_dali}" for s in sporcular]
+
+def guncelle_liste():
+    liste.delete(0, tk.END)
+    for s in sporcu_listesi():
+        liste.insert(tk.END, s)
+
+# GUI Başlatma
+pencere = tk.Tk()
+pencere.title("Spor Takip Uygulaması")
+pencere.geometry("500x400")
+
+frame = tk.Frame(pencere)
+frame.pack(pady=10)
+
+liste = tk.Listbox(frame, width=70)
+liste.pack()
+guncelle_liste()
+
+btn_frame = tk.Frame(pencere)
+btn_frame.pack(pady=10)
+
+btn1 = tk.Button(btn_frame, text="Sporcu Ekle", command=sporcu_ekle_gui)
+btn1.grid(row=0, column=0, padx=5)
+
+btn2 = tk.Button(btn_frame, text="Program Oluştur", command=program_ekle_gui)
+btn2.grid(row=0, column=1, padx=5)
+
+btn3 = tk.Button(btn_frame, text="İlerleme Kaydet", command=ilerleme_kaydet_gui)
+btn3.grid(row=0, column=2, padx=5)
+
+btn4 = tk.Button(btn_frame, text="Rapor Al", command=rapor_al_gui)
+btn4.grid(row=0, column=3, padx=5)
+
+btn5 = tk.Button(pencere, text="Kapat", command=pencere.quit)
+btn5.pack(pady=10)
+
+pencere.mainloop()
+
