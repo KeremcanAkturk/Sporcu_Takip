@@ -80,7 +80,26 @@ def guncelle_liste():
     for s in sporcu_listesi():
         liste.insert(tk.END, s)
 
-# GUI Başlatma
+def sporcu_sil():
+    secili_index = liste.curselection()
+    if secili_index:
+        isim_dali = liste.get(secili_index)
+        isim = isim_dali.split(" - ")[0]
+        for s in sporcular:
+            if s.isim == isim:
+                sporcular.remove(s)
+                break
+        guncelle_liste()
+        messagebox.showinfo("Silindi", f"{isim} silindi.")
+
+def sag_tik_menu(event):
+    try:
+        liste.selection_clear(0, tk.END)
+        liste.selection_set(liste.nearest(event.y))
+        menu.tk_popup(event.x_root, event.y_root)
+    finally:
+        menu.grab_release()
+
 pencere = tk.Tk()
 pencere.title("Spor Takip Uygulaması")
 pencere.geometry("500x400")
@@ -91,6 +110,11 @@ frame.pack(pady=10)
 liste = tk.Listbox(frame, width=70)
 liste.pack()
 guncelle_liste()
+
+menu = tk.Menu(pencere, tearoff=0)
+menu.add_command(label="Sporcuyu Sil", command=sporcu_sil)
+
+liste.bind("<Button-3>", sag_tik_menu)
 
 btn_frame = tk.Frame(pencere)
 btn_frame.pack(pady=10)
